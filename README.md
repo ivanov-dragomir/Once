@@ -21,6 +21,14 @@ Once uses UserDefaults.standard to persist tokens between app launches. (see [Us
 - Xcode 11.0+
 - Swift 5.1+
 
+## Installation
+
+Update your Package.swift to include this to your package dependencies:
+
+```
+.package(url: "https://github.com/ivanov-dragomir/Once.git")
+```
+
 ## Usage
 
 ### Define your own tokens by extending `Once.Token`:
