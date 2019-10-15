@@ -1,6 +1,6 @@
 # Once
 
-Once is a slim iOS framework for executing code... well - once.
+A small iOS library to manage one-off operations.
 Once uses UserDefaults.standard to persist tokens between app launches. (see [Usage](#usage))
 
 - [Features](#features)
@@ -38,23 +38,23 @@ Once.perform(.myToken) {
 }
 ```
 
-### Executing code only once every `x` seconds (e.g. optimizing frequent fetches)
+### Executing code only once every `x` seconds. Your app should only phone home to update content once every hour.
 
 ```swift
-Once.perform(.myToken, per: .interval(10)) { 
+Once.perform(.myToken, per: .interval(60 * 60)) { 
     //
 }
 ```
 
-### Executing code only once while the application is installed (e.g. initial setup)
+### Executing code only once while the application is installed. Users should only get the guided tour once.
 
 ```swift
-Once.perform(.myToken, per: .launch) { 
+Once.perform(.tour, per: .launch) { 
     // 
 }
 ```
 
-### Executing code only once every `x` but persisted between app launches (e.g. ask for App review only once every 3 months)
+### Executing code only once every `x` but persisted between app launches. You should ask for App review only once every 3 months.
 
 ```swift
 Once.perform(.myToken, per: .persistentInterval(60 * 60 * 24 * 30 * 3)) { 

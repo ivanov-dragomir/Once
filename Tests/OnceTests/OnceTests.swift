@@ -2,19 +2,20 @@ import XCTest
 @testable import Once
 
 private extension Once.Token {
-    static let test = Once.Token(rawValue: "test")
+    static let simple = Once.Token(rawValue: "simple")
+    static let interval = Once.Token(rawValue: "interval")
 }
 
 final class OnceTests: XCTestCase {
     func testSimplePerformOnce() {
-        Once.perform(.test) { print("Perform once.") }
-        Once.perform(.test) { XCTFail() }
+        Once.perform(.simple) { print("Perform once.") }
+        Once.perform(.simple) { XCTFail() }
     }
     
     func testInterval() {
-        Once.perform(.test, per: .interval(5)) { print("Perform once every 5 seconds.") }
+        Once.perform(.interval, per: .interval(5)) { print("Perform once every 5 seconds.") }
         sleep(3)
-        Once.perform(.test, per: .interval(5)) { XCTFail() }
+        Once.perform(.interval, per: .interval(5)) { XCTFail() }
     }
 
     static var allTests = [

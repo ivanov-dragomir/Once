@@ -31,42 +31,55 @@ public final class Once {
         }
     }
     
-    public static func perform(_ token: Token, closure: () -> Void) {
-        perform(token, per: .launch, closure: closure)
+    /// Perform operation once. Identified by a token.
+    /// - Parameter token: Identification token of the operation.
+    /// - Parameter closure: The operation itself.
+    /// - Returns: `true` if the operation has been executed, otherwise `false`
+    @discardableResult
+    public static func perform(_ token: Token, operation: () -> Void) -> Bool {
+        return perform(token, per: .launch, operation: operation)
     }
     
-    public static func perform(_ token: Token, per: Per, closure: () -> Void) {
+    /// Perform operation once. Identified by a token. Control how long the token should be persisted.
+    /// - Parameter token: Identification token of the operation.
+    /// - Parameter per: Control over execution frequency.
+    /// - Parameter closure: The operation itself.
+    /// - Returns: `true` if the operation has been executed, otherwise `false`
+    @discardableResult
+    public static func perform(_ token: Token, per: Per, operation: () -> Void) -> Bool {
         switch per {
         case .app:
-            guard UserDefaults.standard.bool(forKey: token.rawValue) == false else { return }
+            guard UserDefaults.standard.bool(forKey: token.rawValue) == false else { return false }
             UserDefaults.standard.set(true, forKey: token.rawValue)
-            closure()
+            operation()
             
         case .launch:
-            guard Per.perLaunchHistory.contains(token) == false else { return }
+            guard Per.perLaunchHistory.contains(token) == false else { return false }
             Per.perLaunchHistory.insert(token)
-            closure()
+            operation()
             
         case .interval(let interval):
             let now = CACurrentMediaTime()
             let next = now + interval
             let extendedToken = Token(rawValue: "\(token.rawValue) every \(interval)\(interval == 1 ? "second" : "seconds")")
             if let until = Per.timeHistory[extendedToken] {
-                guard until < now else { return }
+                guard until < now else { return false }
                 Per.timeHistory[extendedToken] = next
-                closure()
+                operation()
             } else {
                 Per.timeHistory[extendedToken] = next
-                closure()
+                operation()
             }
             
         case .persistentInterval(let interval):
             let now = CACurrentMediaTime()
             let next = now + interval
             let extendedToken = Token(rawValue: "\(token.rawValue) every \(interval)\(interval == 1 ? "second" : "seconds")")
-            guard UserDefaults.standard.double(forKey: extendedToken.rawValue) < now else { return }
+            guard UserDefaults.standard.double(forKey: extendedToken.rawValue) < now else { return false }
             UserDefaults.standard.set(next, forKey: extendedToken.rawValue)
-            closure()
+            operation()
         }
+        
+        return true
     }
 }
